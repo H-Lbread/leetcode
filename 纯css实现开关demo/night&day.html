@@ -93,8 +93,8 @@
 
 <body>
     <label class="switch">
-        <input type="checkbox" onchange="document.body.style.getPropertyValue('--bg').trim()==='#363636'?'#ffffff':'#363636'">
-        <span class="slider round"></span>
+        <input type="checkbox" onchange="document.body.style.getPropertyValue('--bg').trim()==='#363636'?document.body.style.setProperty('--bg', '#f0f5fa'):document.body.style.setProperty('--bg', '#363636')" />
+    <span class="slider round"></span>
     </label>
 </body>
 <script>

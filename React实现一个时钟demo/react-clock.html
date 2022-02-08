@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Clock</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <style>
+    .deTime {
+      position: relative;
+      height: 50px;
+      width: 300px;
+      padding: 5px;
+      background: linear-gradient(to bottom, #0071ff, #00b1ff);
+      display: flex;
+      font-family: TrebuchetMS,Rotobo,"Microsoft YaHei",sans-serif;
+    }
+
+    .deTime .container {
+      position: relative;
+      height: 50px;
+      width: 50px;
+      border-radius: 150px;
+      box-shadow: #353535 0px 0px 1px 0px;
+      background: radial-gradient(#0040ff, #6adbff);
+    }
+
+    .deTime .second {
+      height: 20px;
+      width: 1px;
+      top: 5px;
+      left: 24px;
+      background-color: #ff6363;
+    }
+
+    .deTime .minute {
+      height: 16px;
+      width: 2px;
+      top: 9px;
+      left: 24px;
+      background-color: #8e8e8e;
+    }
+
+    .deTime .hour {
+      height: 12px;
+      width: 2px;
+      top: 13px;
+      left: 24px;
+      background-color: #8e8e8e;
+    }
+
+    .deTime .second, .deTime .minute, .deTime .hour {
+      position: absolute;
+      transform-origin: center bottom;
+      box-shadow: 0px 0px 2px 0px #000;
+    }
+
+    .deTime .center {
+      width: 2px;
+      height: 2px;
+      border-radius: 1px;
+      background-color: #ffffff;
+      box-shadow: 0px 0px 3px 1px #8c8c8c;
+      position: absolute;
+      top: 24px;
+      left: 24px;
+    }
+
+    .deTime .time {
+      line-height: 50px;
+      font-size: 36px;
+      color: #fff;
+      margin-left: 15px;
+    }
+
+    .deTime .time span {
+      font-size: 22px;
+    }
+
+    .deTime .date {
+      font-size: 13px;
+      color: #fff;
+      display: flex;
+      flex-flow: column;
+      margin-left: 15px;
+      padding: 6px 0;
+    }
+
+    .deTime .date > div {
+      flex-basis: 50%;
+    }
+
+    .grad {
+      height: 2px;
+      width: 1px;
+      background-color: #fff;
+      position: absolute;
+      left: 25px;
+      top: 1px;
+      transform-origin: center 24px;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  class DeTime extends React.Component {
+  TRANSITION = '100ms linear';
+  NUMBER_TRANSLATION = ['日', '一', '二', '三', '四', '五', '六'];
+
+  constructor() {
+    super()
+    this.state = {
+      hourAngle: 0,
+      minAngle: 0,
+      secAngle: 0,
+      transition: this.TRANSITION
+    }
+  }
+
+  updateTime() {
+    let date = new Date()
+
+    let secAngle = (date.getSeconds() + date.getMilliseconds() / 1000) * 6;
+    let minAngle = date.getMinutes() * 6 + secAngle / 60;
+    let hourAngle = (date.getHours() % 12) * 30 + minAngle / 12;
+
+    let transition = this.TRANSITION
+    //  当秒针走到 0 的时候 角度其实是变小了 所以会倒着转 需要暂时删除 transition
+    if (this.state.secAngle > secAngle) transition = null;
+
+    this.setState({
+      hourAngle: hourAngle,
+      minAngle: minAngle,
+      secAngle: secAngle,
+      transition: transition
+    })
+  }
+
+  componentWillMount() {
+    this.updateTime();
+
+    this.timer = setInterval(() => { this.updateTime() }, 100);
+  }
+
+  componentWillUnmount() {
+    this.timer && clearTimeout(this.timer);
+  }
+
+  leadingZero(number) {
+    return number < 10 ? '0' + number : number
+  }
+
+
+  render() {
+    let hourArr = [...new Array(12).keys()]
+    let grad = hourArr.map((item) => {
+      return <div key={item} className="grad" style={{transform: `rotateZ(${item*30}deg)`}}></div>
+    })
+    let state = this.state
+    let now = new Date()
+
+    return (
+      <div className="deTime">
+        <div className="container">
+          {grad}
+          <div className="minute" style={{transform:  'rotateZ('+state.minAngle+'deg)'}}></div>
+          <div className="hour" style={{transform:  'rotateZ('+state.hourAngle+'deg)'}}></div>
+          <div className="second" style={{transition: state.transition, transform:  'rotateZ('+state.secAngle+'deg)'}}></div>
+          <div className="center"></div>
+        </div>
+        <div className="time">
+          {this.leadingZero(now.getHours())}:{this.leadingZero(now.getHours())}<span> {this.leadingZero(now.getSeconds())}</span>
+        </div>
+        <div className="date">
+          <div>星期{this.NUMBER_TRANSLATION[now.getDay()]}</div>
+          <div>{now.getFullYear()}年{now.getMonth()}月{now.getDate()}日</div>
+        </div>
+      </div>
+    )
+  }
+}
+
+  ReactDOM.render(
+    <DeTime/>,
+    document.getElementById('root')
+  );
+
+</script>
+</body>
+</html>

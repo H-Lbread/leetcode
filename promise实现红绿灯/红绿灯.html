@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚥</title>
+    <style>
+        #box{
+            width: 50px;
+            height: 50px;
+            background-color: black;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="box"></div>
+    <script>
+        let box = document.getElementById('box')
+        function red(){
+            return new Promise((resolve,reject) => {
+                box.style.backgroundColor = 'red';
+                // 利用 settimeout 特性调用green（）
+                setTimeout(() => {
+                    resolve(yellow())
+                }, 1000);
+            })
+        };
+        function yellow(){
+            return new Promise((resolve,reject) => {
+                box.style.backgroundColor = 'yellow';
+
+                setTimeout(() => {
+                    resolve(green())
+                }, 1000);
+            })
+        };
+        function green(){
+            return new Promise((resolve,reject) => {
+                box.style.backgroundColor = 'green';
+                setTimeout(() => {
+                    resolve(red())
+                }, 1000);
+            })
+        };
+        red();
+    </script>
+</body>
+</html>
